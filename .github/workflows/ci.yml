@@ -1,0 +1,20 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Bash syntax
+        run: |
+          bash -n install-server-mcp.sh
+          bash -n uninstall-server-mcp.sh
+      - name: ShellCheck
+        run: shellcheck -S warning install-server-mcp.sh uninstall-server-mcp.sh
+      - name: Embedded Python syntax
+        run: |
+          sed -n "/<<'PYCODE'/,/^PYCODE$/p" install-server-mcp.sh | sed '1d;$d' > /tmp/server.py
+          python3 -m py_compile /tmp/server.py
